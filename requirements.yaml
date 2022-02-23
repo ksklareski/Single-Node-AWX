@@ -1,0 +1,4 @@
+---
+- src: geerlingguy.ansible
+- src: geerlingguy.docker
+- src: geerlingguy.nodejs

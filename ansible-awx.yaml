@@ -1,0 +1,45 @@
+---
+- name: Install awx
+  hosts: awx
+  gather_facts: true
+  roles:
+    - geerlingguy.docker
+    - geerlingguy.ansible
+    - geerlingguy.nodejs
+
+  tasks:
+    - name: Install more deps
+      ansible.builtin.apt:
+        name:
+          - git
+          - unzip
+          - wget
+        update_cache: true
+
+    - name: Install docker compose (idk)
+      ansible.builtin.pip:
+        name: docker-compose
+
+    - name: Create awx dir
+      ansible.builtin.file:
+        path: "{{ awx_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download awx files
+      ansible.builtin.command: bash -c "cd /srv/awx && (ls awx-17.1.0 2>&1 > /dev/null || (wget https://github.com/ansible/awx/archive/17.1.0.zip && unzip 17.1.0.zip))"
+
+    - name: Ensure secret is used in inventory
+      ansible.builtin.lineinfile:
+        path: "{{ awx_dir }}/awx-17.1.0/installer/inventory"
+        line: "secret_key={{ awx_secret }}"
+        regexp: secret_key=awxsecret
+
+    - name: Ensure password is used in inventory
+      ansible.builtin.lineinfile:
+        path: "{{ awx_dir }}/awx-17.1.0/installer/inventory"
+        line: "admin_password={{ awx_admin_pw }}"
+        regexp: "# admin_password=password"
+
+    - name: Install AWX
+      ansible.builtin.command: bash -c "curl --insecure http://localhost:80 || (cd {{ awx_dir }}/awx-17.1.0/installer && (ansible-playbook -i inventory install.yml))"

@@ -1,0 +1,11 @@
+---
+all:
+  hosts:
+  children:
+    awx:
+      hosts:
+        dev-awx:
+          ansible_user: root
+          awx_dir: /srv/awx
+          awx_secret: replace_this_secret
+          awx_admin_pw: replace_this_password

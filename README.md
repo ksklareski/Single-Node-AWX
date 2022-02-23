@@ -1,0 +1,1 @@
+Quick and dirty Ansible AWX setup using docker-compose on a single node which is intended for testing. This repo does not follow the current AWX best practices for installation.
